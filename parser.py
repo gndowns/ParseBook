@@ -1,2 +1,6 @@
+import sys
+from Messages import Messages
+
 def run():
-  print "hello world"
+
+run()
