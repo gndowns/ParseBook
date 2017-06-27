@@ -4,8 +4,6 @@ class ParseMessages:
 		self.users = Users
 		self.owner = None
 
-	def run():
-
 
 	class Thread(ParseMessages):
 		def __init__(self, thread_id):
