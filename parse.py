@@ -30,6 +30,10 @@ def parse(messages_path):
       start = messages_html.find(tag, start)
       continue
 
+    if not threads[people]:
+      threads[people] = Thread(people)
+    thread = threads[people]
+
     start = messages_html.find(tag, start)
 
 def get_people(string, start, end):
