@@ -24,6 +24,12 @@ def parse(messages_path):
       people_end = messages_html.find('<div class="message">', start)
       people = get_people(messages_html, start, people_end)
 
+    # skip group chats
+    if len(people) > 2:
+      tag = '<div class="thread">'
+      start = messages_html.find(tag, start)
+      continue
+
     start = messages_html.find(tag, start)
 
 def get_people(string, start, end):
