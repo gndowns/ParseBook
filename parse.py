@@ -18,6 +18,17 @@ def parse(messages_path):
   while(start != -1):
     start += len(tag)
 
+    # get thread participants
+    if tag == '<div class="thread">':
+      # people list ends where the first message starts
+      people_end = messages_html.find('<div class="message">', start)
+      people = get_people(messages_html, start, people_end)
+
     start = messages_html.find(tag, start)
+
+def get_people(string, start, end):
+  people = string[start:end].strip().strip("\n").split(', ')
+  people = [person.strip('&#064;facebook.com') for person in people]
+  return frozenset(people)
 
 parse(sys.argv[1])
