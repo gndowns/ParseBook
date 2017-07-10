@@ -18,21 +18,21 @@ class Thread:
     # messages, the first being empty
     # use self.messages to access first non-empty message
     self.message_list = Message()
-    self.last_msg = self.message_list
+    self.first_message = self.message_list
 
   def __getattr__(self, key):
     if key == "messages":
-      if self.message_list.next_msg:
-        return self.message_list.next_msg
+      if self.message_list.prev_msg:
+        return self.message_list.prev_msg
       else:
         return self.message_list
     else:
       return -1
     
-  def add_message(self, message):
-    message.prev_msg = self.last_msg
-    self.last_msg.next_msg = message
-    self.last_msg = message
+  def prepend_message(self, message):
+    message.next_msg = self.first_message
+    self.first_message.prev_msg = message
+    self.first_message = message
 
 class Message:
   def __init__(self, sender=None, created_at=None, content=None, prev_msg=None, next_msg=None):
