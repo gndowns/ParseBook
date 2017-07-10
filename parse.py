@@ -49,24 +49,16 @@ def parse(messages_path):
 def get_message(string, start, end):
   message_html = string[start:end].strip().strip("\n")
 
-  index = 0
-  tag = '<span class="user">'
-
-  sender_tag = message_html.find(tag, 0) + len(tag)
-  index = message_html.find('</span>', sender_tag)
-  sender = message_html[sender_tag:index]
-
-  tag = '<span class="meta">'
-  time_tag = message_html.find(tag, index) + len(tag)
-  index = message_html.find('</span>', time_tag)
-  created_at = message_html[time_tag:index]
-
-  tag='<p>'
-  p_tag = message_html.find(tag, index) + len(tag)
-  p_tag_close = message_html.find('</p>', p_tag)
-  content = message_html[p_tag:p_tag_close]
+  sender = get_tag(message_html, '<span class="user">', '</span>')
+  created_at = get_tag(message_html, '<span class="meta">', '</span>')
+  content = get_tag(message_html, '<p>', '</p>')
 
   return Message(sender, created_at, content)
+
+def get_tag(string, tag_open, tag_close):
+  start = string.find(tag_open) + len(tag_open)
+  close = string.find(tag_close, start)
+  return string[start:close]
 
 def get_people(string, start, end):
   people = string[start:end].strip().strip("\n").split(', ')
