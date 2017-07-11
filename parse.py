@@ -32,7 +32,7 @@ def parse(messages_path, out_path):
         continue
 
       if not threads[people]:
-        threads[people] = Thread(people)
+        threads[people] = Thread()
       thread = threads[people]
 
     elif tag == '<div class="message">':
