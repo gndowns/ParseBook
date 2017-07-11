@@ -1,7 +1,8 @@
 import sys
 from threads.threads import Threads, Thread, Message
+import json
 
-def parse(messages_path):
+def parse(messages_path, out_path):
   threads = Threads()
 
   with open(messages_path) as fp:
@@ -25,13 +26,13 @@ def parse(messages_path):
       people = get_people(messages_html, start, people_end)
 
       # skip group chats
-      if len(people) > 2:
+      if len(people.split()) > 2:
         tag = '<div class="thread">'
         start = messages_html.find(tag, start)
         continue
 
       if not threads[people]:
-        threads[people] = Thread(people)
+        threads[people] = Thread()
       thread = threads[people]
 
     elif tag == '<div class="message">':
@@ -39,13 +40,36 @@ def parse(messages_path):
       new_message = get_message(messages_html, start, message_end)
       # facebook gives the messages in reverse chrono order
       thread.prepend_message(new_message)
+      thread.size += 1
 
     next_message = messages_html.find('<div class="message">', start)
     next_thread = messages_html.find('<div class="thread">', start)
 
-    tag = '<div class="message">' if next_message < next_thread else '<div class="thread">'
+    # end of thread logic
+    if next_message == -1 or (next_thread < next_message and next_thread != -1):
+      message = thread.messages
+      thread.messages = [None] * thread.size
+      for i in range(0, thread.size):
+        thread.messages[i] = {
+          'sender': message.sender,
+          'created_at': message.created_at,
+          'content': message.content
+        }
+        message = message.next_msg
+
+    if next_thread < next_message and next_thread != -1:
+      tag = '<div class="thread">'
+    else:
+      tag = '<div class="message">'
+
+    # tag = '<div class="message">' if next_message < next_thread else '<div class="thread">'
     start = messages_html.find(tag, start)
 
+  for people in threads.threads:
+    threads[people] = threads[people].__dict__
+
+  with open(out_path, "w") as fp:
+    json.dump(threads.__dict__, fp, indent=2)
 def get_message(string, start, end):
   message_html = string[start:end].strip().strip("\n")
 
@@ -58,11 +82,16 @@ def get_message(string, start, end):
 def get_tag(string, tag_open, tag_close):
   start = string.find(tag_open) + len(tag_open)
   close = string.find(tag_close, start)
-  return string[start:close]
+  return string[start:close].strip().strip("\n")
 
 def get_people(string, start, end):
   people = string[start:end].strip().strip("\n").split(', ')
-  people = [person.strip('&#064;facebook.com') for person in people]
-  return frozenset(people)
+  people = [person.strip('&#064;facebook.com').strip("@") for person in people]
+  people.sort()
+  return " ".join(people)
 
-parse(sys.argv[1])
+if not len(sys.argv) == 3:
+  print("ERROR need in and out path")
+  sys.exit()
+
+parse(sys.argv[1], sys.argv[2])
