@@ -1,8 +1,9 @@
 class Threads:
-  def __init__(self, _owner="", _threads=None):
+  def __init__(self, _owner="", _threads=None, _people=None):
     self.owner = _owner
     # dictionary with keys as frozensets of fb id's
     self.threads = _threads if _threads else {}
+    self.people = _people if _people else {}
 
   def __setitem__(self, people, thread):
     self.threads[people] = thread
