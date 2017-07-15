@@ -15,6 +15,7 @@ class Thread:
     # this is a pointer to linked list of 
     # messages, the last being empty
     self.messages = Message()
+    self.message_list = []
     self.size = 0
 
   def prepend_message(self, message):
