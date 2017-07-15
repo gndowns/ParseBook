@@ -4,6 +4,7 @@ import json, html
 
 THREAD_TAG = '<div class="thread">'
 MESSAGE_TAG = '<div class="message">'
+OWNER_ID = 0
 
 def main(messages_path, out_path):
 
@@ -28,7 +29,7 @@ def parse_html(msgs_html):
     next_thread = msgs_html.find(THREAD_TAG, thread_index)
     next_thread = next_thread + len(THREAD_TAG) if next_thread != -1 else len(msgs_html)
 
-    thread = get_thread_for_people(msgs_html, thread_index, threads)
+    thread = get_thread(msgs_html, thread_index, threads)
 
     # --- WIP skip group chats ---
     if len(thread.people.split()) > 2: continue
@@ -70,10 +71,17 @@ def messages_to_list(thread):
   thread.size = 0
   thread.messages = Message()
 
-def get_thread_for_people(msgs_html, start, threads):
+def get_thread(msgs_html, start, threads):
   end = msgs_html.find(MESSAGE_TAG, start)
   people = html.unescape( msgs_html[start:end].strip() ).split(', ')
   people = [p.strip('@facebook.com') for p in people]
+
+  # init owner id (only called on first thread)
+  global OWNER_ID
+  if not OWNER_ID and len(people) <= 2:
+    threads.people[threads.owner] = people[1]
+    OWNER_ID = people[1]
+
   people.sort()
   people = " ".join(people)
 
