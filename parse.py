@@ -1,6 +1,6 @@
 import sys
 from threads.threads import Threads, Thread, Message
-import json
+import json, html
 
 THREAD_TAG = '<div class="thread">'
 MESSAGE_TAG = '<div class="message">'
@@ -20,7 +20,7 @@ def parse_html(msgs_html):
 
   h1_open = msgs_html.find("<h1>") + len("<h1>")
   h1_close = msgs_html.find("</h1>", h1_open)
-  threads.owner = msgs_html[h1_open:h1_close].strip()
+  threads.owner = html.unescape( msgs_html[h1_open:h1_close].strip() )
 
   next_thread = msgs_html.find(THREAD_TAG, h1_close) + len(THREAD_TAG)
   while (next_thread < len(msgs_html) ):
@@ -69,8 +69,8 @@ def messages_to_list(thread):
 def get_thread_for_people(msgs_html, start, threads):
   # TODO: multi thread threads
   end = msgs_html.find(MESSAGE_TAG, start)
-  people = msgs_html[start:end].strip().strip("\n").split(', ')
-  people = [p.strip('&#064;facebook.com') for p in people]
+  people = html.unescape( msgs_html[start:end].strip() ).split(', ')
+  people = [p.strip('@facebook.com') for p in people]
   people.sort()
   people = " ".join(people)
 
@@ -92,7 +92,7 @@ def get_message(msgs_html, start, thread):
 def get_tag(string, tag_open, tag_close):
   start = string.find(tag_open) + len(tag_open)
   close = string.find(tag_close, start)
-  return string[start:close].strip().strip("\n").replace("&#039;", "'")
+  return html.unescape( string[start:close].strip() )
 
 
 if not len(sys.argv) == 3:
