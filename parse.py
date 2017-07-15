@@ -14,7 +14,6 @@ def main(messages_path, out_path):
 
   with open(out_path, "w") as fp:
     json.dump(threads, fp, indent=2)
-    # print(json.dumps(threads, indent=2))
 
 def parse_html(msgs_html):
   threads = Threads()
@@ -93,7 +92,7 @@ def get_message(msgs_html, start, thread):
 def get_tag(string, tag_open, tag_close):
   start = string.find(tag_open) + len(tag_open)
   close = string.find(tag_close, start)
-  return string[start:close].strip().strip("\n")
+  return string[start:close].strip().strip("\n").replace("&#039;", "'")
 
 
 if not len(sys.argv) == 3:
