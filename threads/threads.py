@@ -11,9 +11,10 @@ class Threads:
     return self.threads.get(people)
 
 class Thread:
-  def __init__(self):
+  def __init__(self, people):
     # this is a pointer to linked list of 
     # messages, the last being empty
+    self.people = people
     self.messages = Message()
     self.message_list = []
     self.size = 0

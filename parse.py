@@ -43,6 +43,7 @@ def parse_html(msgs_html):
   for people in threads.threads:
     thread = threads[people]
     threads[people] = {
+      'people': thread.people,
       'messages': thread.message_list,
       'size': len(thread.message_list)
     }
@@ -73,7 +74,7 @@ def get_thread_for_people(msgs_html, start, threads):
   people.sort()
   people = " ".join(people)
 
-  if not threads[people]: threads[people] = Thread()
+  if not threads[people]: threads[people] = Thread(people)
   return threads[people]
 
 def get_message(msgs_html, start, thread):
