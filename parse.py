@@ -30,6 +30,9 @@ def parse_html(msgs_html):
 
     thread = get_thread_for_people(msgs_html, thread_index, threads)
 
+    # --- WIP skip group chats ---
+    if len(thread.people.split()) > 2: continue
+
     next_msg = msgs_html.find(MESSAGE_TAG, thread_index) + len(MESSAGE_TAG)
     while (next_msg < next_thread):
       msg_index = next_msg
