@@ -32,12 +32,15 @@ def parse_html(msgs_html):
     thread = get_thread(msgs_html, thread_index, threads)
 
     # --- WIP skip group chats ---
-    if len(thread.people.split()) > 2: continue
+    people = thread.people.split()
+    if len(people) != 2: continue
+
+    friend_id = people[0] if people[0] != OWNER_ID else people[1]
 
     next_msg = msgs_html.find(MESSAGE_TAG, thread_index) + len(MESSAGE_TAG)
     while (next_msg < next_thread):
       msg_index = next_msg
-      next_msg = get_message(msgs_html, msg_index, thread)
+      next_msg = get_message(msgs_html, msg_index, thread, threads, friend_id)
       next_msg = next_msg + len(MESSAGE_TAG) if next_msg != -1 else next_thread
 
     # --- end of thread ---
@@ -88,13 +91,17 @@ def get_thread(msgs_html, start, threads):
   if not threads[people]: threads[people] = Thread(people)
   return threads[people]
 
-def get_message(msgs_html, start, thread):
+def get_message(msgs_html, start, thread, threads, f_id):
   next_msg = msgs_html.find(MESSAGE_TAG, start)
   msg_html = msgs_html[start:next_msg].strip().strip("\n")
 
   sender = get_tag(msg_html, '<span class="user">', '</span>')
   created_at = get_tag(msg_html, '<span class="meta">', '</span>')
   content = get_tag(msg_html, '<p>', '</p>')
+
+  # add sender to ID dictionary
+  if sender != threads.owner and not threads.people.get(sender):
+    threads.people[sender] = f_id
 
   thread.prepend_message( Message(sender, created_at, content) )
   thread.size += 1
