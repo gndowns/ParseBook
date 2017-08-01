@@ -70,7 +70,7 @@ def messages_to_list(thread):
 def get_thread_for_people(msgs_html, start, threads):
   end = msgs_html.find(MESSAGE_TAG, start)
   people = html.unescape( msgs_html[start:end].strip() ).split(', ')
-  people = [p.strip('@facebook.com') for p in people]
+  people = [p.split('@')[0] for p in people]
   people.sort()
   people = " ".join(people)
 
